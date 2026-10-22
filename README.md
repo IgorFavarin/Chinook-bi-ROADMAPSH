@@ -17,7 +17,7 @@ Este projeto tem como objetivo desenvolver habilidades em SQL, Python, Pandas e 
 
 ### 🚀 Checklist de Desenvolvimento
 
-- [ ] **01.** Faturamento mensal
+- [x] **01.** Faturamento mensal
 - [ ] **02.** Crescimento mensal (MoM)
 - [ ] **03.** Ticket médio por país
 - [ ] **04.** Clientes mais valiosos
