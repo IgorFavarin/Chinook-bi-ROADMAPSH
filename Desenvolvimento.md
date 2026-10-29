@@ -34,3 +34,44 @@ Entregáveis:
     gráfico de linhas:
 
 SQL: strftime(), SUM(), COUNT(), GROUP BY.
+
+-------------------
+
+02. Crescimento mês contra mês (MoM) Intermediário
+Solicitação do gestor: quanto o faturamento cresceu ou caiu em relação ao mês anterior?
+Entregáveis:
+    receita do mês e receita anterior: A consulta da receita mensal já foi feita no ex01, então aqui já vamos aproveitar ela e calcular a receita do mês anterior usando a função `LAG()` junto com um CTE.
+
+    ```sql
+        with RECEITA_MENSAL AS
+        (SELECT strftime('%Y-%m', invoicedate) as mes_ano, sum(total)as receita_mensal from Invoice
+        GROUP by strftime('%Y-%m', invoicedate)
+        ORDER by mes_ano)
+        SELECT mes_ano, receita_mensal, lag(receita_mensal) over (ORDER by mes_ano) as receita_mês_anterior
+        from receita_mensal
+    ```
+    
+    diferença absoluta e variação percentual: Aqui, ambos resultados usam dos mesmos valores para calculo, então foram desenvolvidos juntos.
+    Diferença abosluta é a subtração do mês atual menos o mês anterior, e a diferença absoluta é o mesmo calculo, mas mostrado em percentual, ou seja, subtração do mês atual menos o mês anterior, o resultado disto dividido pelo mês anterior e o resultado vezes 100.
+
+    ```sql
+        with CALCULO_RECEITA_MENSAL AS
+        (SELECT strftime('%Y-%m', invoicedate) as mes_ano, sum(total)as receita_mensal from Invoice
+        GROUP by strftime('%Y-%m', invoicedate))
+        SELECT mes_ano, receita_mensal, 
+        LAG(receita_mensal) over (ORDER by mes_ano) as receita_mês_anterior,
+        ROUND(receita_mensal - lag(receita_mensal)over (order by mes_ano),2) as diferenca_absoluta,
+        ROUND(
+            (((receita_mensal - lag(receita_mensal)over (order by mes_ano)) /
+            NULLIF(LAG(receita_mensal) OVER (ORDER BY mes_ano),0)
+            )*100),2) as diferenca_relativa
+            from CALCULO_RECEITA_MENSAL
+            ORDER by mes_ano
+    ```
+    Gráfico de linhas com os percentuais.
+
+
+    ![exercício 02](img/grafico_ex2.png)
+
+
+SQL: CTE, LAG(), NULLIF() e operações matemáticas.
